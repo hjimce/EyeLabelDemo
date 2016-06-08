@@ -6,8 +6,8 @@
 #include "ExampleDemo.h"
 #include "ExampleDemoDlg.h"
 #include "afxdialogex.h"
+#include <algorithm>
 #include <cmath>
-#include "SkinTuneCorrection.h"
 #define IDC_NEXT_BUTTON 10000
 #define IDC_GROUP_BUTTON 8000
 
@@ -29,7 +29,7 @@ CExampleDemoDlg::CExampleDemoDlg(CWnd* pParent /*=NULL*/)
 	m_bShowEffect = false;
 	m_rtShowRect.X = m_rtShowRect.Y = m_rtShowRect.Width = m_rtShowRect.Height = 0;
 	m_fZoom = 1.0f;
-	m_imagepercent = 0.6;
+	m_imagepercent = 0.4;
 	m_templatepercent = 0.1;
 	m_classifyid = -1;
 }
@@ -106,7 +106,7 @@ BOOL CExampleDemoDlg::OnInitDialog()
 
 
 
-	::SetWindowPos(this->m_hWnd, HWND_BOTTOM, 200, 0, 1200, 1000, SWP_NOZORDER);
+	::SetWindowPos(this->m_hWnd, HWND_BOTTOM, 200, 0, 1400, 1000, SWP_NOZORDER);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -115,6 +115,7 @@ vector<Bitmap*> CExampleDemoDlg::LoadTemplateImg(string filesrc)
 	vector<Bitmap*> tempplate;
 	vector<string>filepathname;
 	ScanDirectory(filesrc, ".jpg", filepathname);//filesrc是文件夹名字
+	//std::sort(filepathname.begin(),filepathname.end());
 	for (int i = 0; i < filepathname.size(); i++)
 	{
 		string image = filesrc+"\\"+ filepathname[i];
@@ -163,16 +164,19 @@ void CExampleDemoDlg::OnPaint()
 
 //2、根据m_imagepercent计算图片绘制区域
 	int mx = draw_rect.X + draw_rect.Width*(1 - m_imagepercent)*0.5;
-	Rect imgrect(mx, draw_rect.Y, m_imagepercent*draw_rect.Width, m_imagepercent*draw_rect.Width);
-
+	Rect imgrect(mx, draw_rect.Y+50, m_imagepercent*draw_rect.Width, m_imagepercent*draw_rect.Width);
+	int tiaoshiw = m_pOrignImage->GetWidth();
+	int tiaoshih = m_pOrignImage->GetHeight();
 	gsClient.DrawImage(m_pOrignImage, imgrect, 0, 0, m_pOrignImage->GetWidth(), m_pOrignImage->GetHeight(), UnitPixel);
 
 
 //3、左侧模板绘制
-	int nleft = 4;
+	float scalewh = 0.6667;
+	int ne = 5;
 
+	int nleft = 5;
 	int tw_left = imgrect.Width*0.33;
-	int th_left = tw_left*0.62;
+	int th_left = tw_left*scalewh;
 	int tx_left = imgrect.X-10- tw_left;
 	Rect tempplate_rect_left(tx_left, draw_rect.Y, tw_left, th_left);
 	
@@ -180,9 +184,9 @@ void CExampleDemoDlg::OnPaint()
 	{
 		int iy = i*(tempplate_rect_left.Height+45);
 		Rect tempplate_recti(tempplate_rect_left.X, tempplate_rect_left.Y+iy, tempplate_rect_left.Width, tempplate_rect_left.Height);
-		gsClient.DrawImage(m_tempplate[i], tempplate_recti, 0, 0, tempplate_recti.Width, tempplate_recti.Height, UnitPixel);
+		gsClient.DrawImage(m_tempplate[i], tempplate_recti, 0, 0, m_tempplate[i]->GetWidth(), m_tempplate[i]->GetHeight(), UnitPixel);
 
-		ResizeBitmap(&m_tempplate[i], tempplate_recti.Width, tempplate_recti.Height);
+		//ResizeBitmap(&m_tempplate[i], tempplate_recti.Width, tempplate_recti.Height);
 
 
 		int newy = tempplate_recti.Y + tempplate_recti.Height+7;
@@ -192,25 +196,20 @@ void CExampleDemoDlg::OnPaint()
 		((CButton *)pButton)->MoveWindow(newx, newy, 50, 15, 1);
 		((CButton *)pButton)->ShowWindow(SW_SHOW);
 	}
-//4、绘制右侧模板
+//绘制左侧第一排
+	
+	int tw_left1 = imgrect.Width*0.33;
+	int th_left1 = tw_left1*scalewh;
+	int tx_left1 = imgrect.X - 20 - 2*tw_left1;
+	Rect tempplate_rect_left1(tx_left1, draw_rect.Y, tw_left1, th_left1);
 
-
-	int tw_right = imgrect.Width*0.33;
-	int th_right = tw_right*0.62;
-	int tx_right = imgrect.X + imgrect.Width+10;
-	Rect tempplate_rect_right(tx_right, draw_rect.Y, tw_right, th_right);
-	int nright = 4;
-	for (int i = nleft; i <nleft+nright; i++)
+	for (int i = ne; i < ne*2; i++)
 	{
-		if (i>m_tempplate.size()-1)
-		{
-			break;
-		}
-		int iy = (i-nleft)*(tempplate_rect_right.Height + 45);
-		Rect tempplate_recti(tempplate_rect_right.X, tempplate_rect_right.Y + iy, tempplate_rect_right.Width, tempplate_rect_right.Height);
-		gsClient.DrawImage(m_tempplate[i], tempplate_recti, 0, 0, tempplate_recti.Width, tempplate_recti.Height, UnitPixel);
+		int iy = (i-ne)*(tempplate_rect_left1.Height + 45);
+		Rect tempplate_recti(tempplate_rect_left1.X, tempplate_rect_left1.Y + iy, tempplate_rect_left1.Width, tempplate_rect_left1.Height);
+		gsClient.DrawImage(m_tempplate[i], tempplate_recti, 0, 0, m_tempplate[i]->GetWidth(), m_tempplate[i]->GetHeight(), UnitPixel);
 
-		ResizeBitmap(&m_tempplate[i], tempplate_recti.Width, tempplate_recti.Height);
+		//ResizeBitmap(&m_tempplate[i], tempplate_recti.Width, tempplate_recti.Height);
 
 
 		int newy = tempplate_recti.Y + tempplate_recti.Height + 7;
@@ -220,6 +219,75 @@ void CExampleDemoDlg::OnPaint()
 		((CButton *)pButton)->MoveWindow(newx, newy, 50, 15, 1);
 		((CButton *)pButton)->ShowWindow(SW_SHOW);
 	}
+
+
+
+
+
+
+
+//4、绘制右侧模板
+
+	int tw_right = imgrect.Width*0.33;
+	int th_right = tw_right*scalewh;
+	int tx_right = imgrect.X + imgrect.Width+10;
+	Rect tempplate_rect_right(tx_right, draw_rect.Y, tw_right, th_right);
+	int nright = 5;
+	for (int i = ne*2; i <ne*3; i++)
+	{
+		if (i>m_tempplate.size()-1)
+		{
+			break;
+		}
+		int iy = (i- ne * 2)*(tempplate_rect_right.Height + 45);
+		Rect tempplate_recti(tempplate_rect_right.X, tempplate_rect_right.Y + iy, tempplate_rect_right.Width, tempplate_rect_right.Height);
+		gsClient.DrawImage(m_tempplate[i], tempplate_recti, 0, 0, m_tempplate[i]->GetWidth(), m_tempplate[i]->GetHeight(), UnitPixel);
+
+		//ResizeBitmap(&m_tempplate[i], tempplate_recti.Width, tempplate_recti.Height);
+
+
+		int newy = tempplate_recti.Y + tempplate_recti.Height + 7;
+		int newx = tempplate_recti.X + tempplate_recti.Width / 3.;
+
+		CButton *pButton = m_radioList[i];
+		((CButton *)pButton)->MoveWindow(newx, newy, 50, 15, 1);
+		((CButton *)pButton)->ShowWindow(SW_SHOW);
+	}
+
+
+	int tw_right1 = imgrect.Width*0.33;
+	int th_right1 = tw_right1*scalewh;
+	int tx_right1 = imgrect.X + (imgrect.Width + 10)+10+ tw_right1;
+	Rect tempplate_rect_right1(tx_right1, draw_rect.Y, tw_right1, th_right1);
+	for (int i = ne * 3; i < ne * 4; i++)
+	{
+		if (i > m_tempplate.size() - 1)
+		{
+			break;
+		}
+		int iy = (i - ne * 3)*(tempplate_rect_right1.Height + 45);
+		Rect tempplate_recti(tempplate_rect_right1.X, tempplate_rect_right1.Y + iy, tempplate_rect_right1.Width, tempplate_rect_right1.Height);
+		gsClient.DrawImage(m_tempplate[i], tempplate_recti, 0, 0, m_tempplate[i]->GetWidth(), m_tempplate[i]->GetHeight(), UnitPixel);
+
+		//ResizeBitmap(&m_tempplate[i], tempplate_recti.Width, tempplate_recti.Height);
+
+
+		int newy = tempplate_recti.Y + tempplate_recti.Height + 7;
+		int newx = tempplate_recti.X + tempplate_recti.Width / 3.;
+
+		CButton *pButton = m_radioList[i];
+		((CButton *)pButton)->MoveWindow(newx, newy, 50, 15, 1);
+		((CButton *)pButton)->ShowWindow(SW_SHOW);
+	}
+
+
+
+
+
+
+
+
+
 //5、绘制底侧"下一张"按钮
 	int bbnx = imgrect.X + imgrect.Width/2.2;
 	int bbny= imgrect.Y+ imgrect.Height+30;
@@ -360,9 +428,11 @@ void CExampleDemoDlg::OnBnClickedBtnNext()
 		SAFE_DELETE(pInImage);
 		return;
 	}
+	//m_pOrignImage = pInImage->Clone(0, 0, pInImage->GetWidth(), pInImage->GetHeight(), PixelFormat32bppARGB);
+	//SAFE_DELETE(pInImage);
 	m_pOrignImage = pInImage;
-
-
+	//m_pOrignImage=GetFaceRect(m_pOrignImage);
+	//SAFE_DELETE(pInImage);
 	this->Invalidate(FALSE);
 }
 
@@ -466,4 +536,85 @@ BOOL CExampleDemoDlg::ResizeBitmap(Bitmap **ppImg, int m_NewWidth, int m_NewHeig
 	delete (*ppImg);
 	(*ppImg) = m_NewImage;
 	return TRUE;
+}
+
+
+#include "facepp/PupilGUI.h"
+Bitmap* CExampleDemoDlg::GetFaceRect(Bitmap* pImageSori)
+{
+	Bitmap* pImageS = pImageSori->Clone(0, 0, pImageSori->GetWidth(), pImageSori->GetHeight(), PixelFormat32bppARGB);
+	// TODO:  在此添加您专用的创建代码
+	float scalew = 1.;
+	if (pImageS->GetWidth() > 480 || pImageS->GetHeight() > 640)
+	{
+
+		scalew=min(480.f / pImageS->GetWidth(), 640.f / pImageS->GetHeight());
+
+		int width = pImageS->GetWidth()*scalew;
+		int height = pImageS->GetHeight()*scalew;
+		ResizeBitmap(&pImageS, width, height);
+	}
+
+
+	Gdiplus::BitmapData TempBitmapData;
+	Gdiplus::Rect rc(0, 0, pImageS->GetWidth(), pImageS->GetHeight());
+	pImageS->LockBits(&rc, Gdiplus::ImageLockModeRead | Gdiplus::ImageLockModeWrite, PixelFormat32bppARGB, &TempBitmapData);
+
+
+	CPupilGUI cpi = CPupilGUI((BYTE*)TempBitmapData.Scan0, TempBitmapData.Width, TempBitmapData.Height);
+	pImageS->UnlockBits(&TempBitmapData);
+	SAFE_DELETE(pImageS);
+	if (cpi.isface == true)
+	{
+		int x0=cpi.m_face_detection.rFace.left;
+		int y0 = cpi.m_face_detection.rFace.top;
+		int width = cpi.m_face_detection.rFace.right;
+		int height = cpi.m_face_detection.rFace.bottom;
+		return GetRect(CRect(x0/scalew, y0/scalew, width/scalew, height/scalew), pImageSori);
+	}
+	else
+	{
+		return pImageSori;
+	}
+
+
+
+}
+Bitmap* CExampleDemoDlg::GetRect(CRect r,Bitmap* pImageSori)
+{
+	int a = r.top + r.left;
+	int b = r.Height();
+	int c = r.Width();
+	Gdiplus::BitmapData TempBitmapData_ori;
+	Gdiplus::Rect rcori(0, 0, pImageSori->GetWidth(), pImageSori->GetHeight());
+	pImageSori->LockBits(&rcori, Gdiplus::ImageLockModeRead | Gdiplus::ImageLockModeWrite, PixelFormat32bppARGB, &TempBitmapData_ori);
+	BYTE*pori= (BYTE*)TempBitmapData_ori.Scan0;
+
+
+
+	Bitmap* pImageS = pImageSori->Clone(0, 0, pImageSori->GetWidth(), pImageSori->GetHeight(), PixelFormat32bppARGB);
+	ResizeBitmap(&pImageS, r.Width(), r.Height());
+	Gdiplus::BitmapData TempBitmapData_scale;
+	Gdiplus::Rect rcscale(0, 0, pImageS->GetWidth(), pImageS->GetHeight());
+	pImageS->LockBits(&rcscale, Gdiplus::ImageLockModeRead | Gdiplus::ImageLockModeWrite, PixelFormat32bppARGB, &TempBitmapData_scale);
+	BYTE*pscale = (BYTE*)TempBitmapData_scale.Scan0;
+
+	for (int i=0;i<r.Height();i++)
+	{
+		for (int j = 0; j < r.Width(); j++)
+		{
+			int posx = r.left+ j;
+			int posy = r.top + i;
+			int indexori = (posy*TempBitmapData_ori.Width + posx) * 4;
+			for (int k=0;k<4;k++)
+			{
+				pscale[(i*r.Width() + j) * 4+k] = pori[indexori+k];
+			}
+
+		}
+	}
+	pImageS->UnlockBits(&TempBitmapData_scale);
+	pImageSori->UnlockBits(&TempBitmapData_ori);
+
+	return  pImageS;
 }

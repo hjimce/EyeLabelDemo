@@ -66,7 +66,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>facepp/faceppapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -93,7 +93,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>facepp/faceppapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -115,6 +115,8 @@
     <ClInclude Include="CommonDefine.h" />
     <ClInclude Include="ExampleDemo.h" />
     <ClInclude Include="ExampleDemoDlg.h" />
+    <ClInclude Include="facepp\faceppapi.h" />
+    <ClInclude Include="facepp\PupilGUI.h" />
     <ClInclude Include="GdiPlusEnv.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SkinTuneCorrection.h" />
@@ -124,7 +126,7 @@
   <ItemGroup>
     <ClCompile Include="ExampleDemo.cpp" />
     <ClCompile Include="ExampleDemoDlg.cpp" />
-    <ClCompile Include="SkinTuneCorrection.cpp" />
+    <ClCompile Include="facepp\PupilGUI.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

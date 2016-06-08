@@ -66,5 +66,7 @@ private:
 
 	string m_lastimgpathname;
 	string m_lastimgname;
+	Bitmap* GetFaceRect(Bitmap* pImageS);
+	Bitmap* GetRect(CRect r, Bitmap* pImageSori);
 
 };
