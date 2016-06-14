@@ -171,41 +171,23 @@ void CExampleDemoDlg::OnPaint()
 
 
 //3、左侧模板绘制
+	int button_w = 100;
+	int button_h = 30;
 	float scalewh = 0.6667;
 	int ne = 5;
 
-	int nleft = 5;
-	int tw_left = imgrect.Width*0.33;
-	int th_left = tw_left*scalewh;
-	int tx_left = imgrect.X-10- tw_left;
-	Rect tempplate_rect_left(tx_left, draw_rect.Y, tw_left, th_left);
-	
-	for (int i = 0; i < nleft; i++)
-	{
-		int iy = i*(tempplate_rect_left.Height+45);
-		Rect tempplate_recti(tempplate_rect_left.X, tempplate_rect_left.Y+iy, tempplate_rect_left.Width, tempplate_rect_left.Height);
-		gsClient.DrawImage(m_tempplate[i], tempplate_recti, 0, 0, m_tempplate[i]->GetWidth(), m_tempplate[i]->GetHeight(), UnitPixel);
-
-		//ResizeBitmap(&m_tempplate[i], tempplate_recti.Width, tempplate_recti.Height);
 
 
-		int newy = tempplate_recti.Y + tempplate_recti.Height+7;
-		int newx = tempplate_recti.X+ tempplate_recti.Width/3.;
+	//绘制左侧第一排
 
-		CButton *pButton = m_radioList[i];
-		((CButton *)pButton)->MoveWindow(newx, newy, 50, 15, 1);
-		((CButton *)pButton)->ShowWindow(SW_SHOW);
-	}
-//绘制左侧第一排
-	
 	int tw_left1 = imgrect.Width*0.33;
 	int th_left1 = tw_left1*scalewh;
-	int tx_left1 = imgrect.X - 20 - 2*tw_left1;
+	int tx_left1 = imgrect.X - 20 - 2 * tw_left1;
 	Rect tempplate_rect_left1(tx_left1, draw_rect.Y, tw_left1, th_left1);
 
-	for (int i = ne; i < ne*2; i++)
+	for (int i = 0; i < ne ; i++)
 	{
-		int iy = (i-ne)*(tempplate_rect_left1.Height + 45);
+		int iy = (i - 0)*(tempplate_rect_left1.Height + 45);
 		Rect tempplate_recti(tempplate_rect_left1.X, tempplate_rect_left1.Y + iy, tempplate_rect_left1.Width, tempplate_rect_left1.Height);
 		gsClient.DrawImage(m_tempplate[i], tempplate_recti, 0, 0, m_tempplate[i]->GetWidth(), m_tempplate[i]->GetHeight(), UnitPixel);
 
@@ -216,9 +198,33 @@ void CExampleDemoDlg::OnPaint()
 		int newx = tempplate_recti.X + tempplate_recti.Width / 3.;
 
 		CButton *pButton = m_radioList[i];
-		((CButton *)pButton)->MoveWindow(newx, newy, 50, 15, 1);
+		((CButton *)pButton)->MoveWindow(newx, newy, button_w, button_h, 1);
 		((CButton *)pButton)->ShowWindow(SW_SHOW);
 	}
+
+//左侧第二排
+	int tw_left = imgrect.Width*0.33;
+	int th_left = tw_left*scalewh;
+	int tx_left = imgrect.X-10- tw_left;
+	Rect tempplate_rect_left(tx_left, draw_rect.Y, tw_left, th_left);
+	
+	for (int i = ne; i < ne * 2; i++)
+	{
+		int iy = (i - ne)*(tempplate_rect_left1.Height + 45);
+		Rect tempplate_recti(tempplate_rect_left.X, tempplate_rect_left.Y+iy, tempplate_rect_left.Width, tempplate_rect_left.Height);
+		gsClient.DrawImage(m_tempplate[i], tempplate_recti, 0, 0, m_tempplate[i]->GetWidth(), m_tempplate[i]->GetHeight(), UnitPixel);
+
+		//ResizeBitmap(&m_tempplate[i], tempplate_recti.Width, tempplate_recti.Height);
+
+
+		int newy = tempplate_recti.Y + tempplate_recti.Height+7;
+		int newx = tempplate_recti.X+ tempplate_recti.Width/3.;
+
+		CButton *pButton = m_radioList[i];
+		((CButton *)pButton)->MoveWindow(newx, newy, button_w, button_h, 1);
+		((CButton *)pButton)->ShowWindow(SW_SHOW);
+	}
+
 
 
 
@@ -250,7 +256,7 @@ void CExampleDemoDlg::OnPaint()
 		int newx = tempplate_recti.X + tempplate_recti.Width / 3.;
 
 		CButton *pButton = m_radioList[i];
-		((CButton *)pButton)->MoveWindow(newx, newy, 50, 15, 1);
+		((CButton *)pButton)->MoveWindow(newx, newy, button_w, button_h, 1);
 		((CButton *)pButton)->ShowWindow(SW_SHOW);
 	}
 
@@ -276,7 +282,7 @@ void CExampleDemoDlg::OnPaint()
 		int newx = tempplate_recti.X + tempplate_recti.Width / 3.;
 
 		CButton *pButton = m_radioList[i];
-		((CButton *)pButton)->MoveWindow(newx, newy, 50, 15, 1);
+		((CButton *)pButton)->MoveWindow(newx, newy, button_w, button_h, 1);
 		((CButton *)pButton)->ShowWindow(SW_SHOW);
 	}
 
@@ -291,7 +297,7 @@ void CExampleDemoDlg::OnPaint()
 //5、绘制底侧"下一张"按钮
 	int bbnx = imgrect.X + imgrect.Width/2.2;
 	int bbny= imgrect.Y+ imgrect.Height+30;
-	((CButton *)m_nextimageb)->MoveWindow(bbnx, bbny, 100, 30, 1);
+	((CButton *)m_nextimageb)->MoveWindow(bbnx, bbny, button_w, button_h, 1);
 	((CButton *)m_nextimageb)->ShowWindow(SW_SHOW);
 
 }
