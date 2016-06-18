@@ -32,7 +32,7 @@ bool CPupilGUI::face_detection(byte *pData,int nWidth,int nHeight ,FACEPP_FACEIN
 {
 #define MAX_FACE_COUNT 10
 	FACEPP_FACEINFO  faceData[MAX_FACE_COUNT];
-	facepp_init();
+	
 	facepp_setDetectionMode(FACEPP_DETECTMODEACCURACY_HIGH);
 	facepp_setAttributeMode(FACEPP_ATTRIBUTEMODE_LANDMARK39);
 	int fn=facepp_detect(pData,nWidth,nHeight,faceData,MAX_FACE_COUNT,0);

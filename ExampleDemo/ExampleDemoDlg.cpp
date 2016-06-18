@@ -8,6 +8,7 @@
 #include "afxdialogex.h"
 #include <algorithm>
 #include <cmath>
+#include "facepp/faceppapi.h"
 #define IDC_NEXT_BUTTON 10000
 #define IDC_GROUP_BUTTON 8000
 
@@ -32,6 +33,7 @@ CExampleDemoDlg::CExampleDemoDlg(CWnd* pParent /*=NULL*/)
 	m_imagepercent = 0.4;
 	m_templatepercent = 0.1;
 	m_classifyid = -1;
+	facepp_init();
 }
 
 CExampleDemoDlg::~CExampleDemoDlg()
@@ -92,7 +94,9 @@ BOOL CExampleDemoDlg::OnInitDialog()
 		{
 			dwStyle |= WS_GROUP;    //第一个按钮时添加分组风格  
 		}
-		pButton->Create("类别", dwStyle, rcBtn, this, IDC_GROUP_BUTTON + i);
+		CString index;
+		index.Format("%d", i);
+		pButton->Create(index, dwStyle, rcBtn, this, IDC_GROUP_BUTTON + i);
 
 		pButton->SetFont(GetFont()); //设置为父窗口的字体  
 		m_radioList.push_back(pButton);
@@ -421,9 +425,31 @@ void CExampleDemoDlg::OnBnClickedBtnNext()
 		m_classifyid = -1;
 		return;
 	}
-	string strFoo =m_imagefilepathname.back();
-	const char* szName = strFoo.c_str();
+	string strFoo = m_imagefilepathname.back();
+	m_pOrignImage = ReadBitmap(strFoo);
+	if (!GetFaceRect(m_pOrignImage))
+	{	
+		m_classifyid = 19;
+		SAFE_DELETE(m_pOrignImage);
+		OnBnClickedBtnNext();
+		//remove(szName);
+
+		//m_imagefilepathname.pop_back();
+		//m_imagefilename.pop_back();
+
+	}
+
+
+
+	//SAFE_DELETE(pInImage);
+	this->Invalidate(FALSE);
+}
+
+Bitmap* CExampleDemoDlg::ReadBitmap(string path)
+{
 	
+	const char* szName = path.c_str();
+
 
 	WCHAR wstr[1000];
 	MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, szName, -1, wstr, 1000);
@@ -432,17 +458,11 @@ void CExampleDemoDlg::OnBnClickedBtnNext()
 	if (pInImage->GetLastStatus() == -1)
 	{
 		SAFE_DELETE(pInImage);
-		return;
+		return NULL;
 	}
-	//m_pOrignImage = pInImage->Clone(0, 0, pInImage->GetWidth(), pInImage->GetHeight(), PixelFormat32bppARGB);
-	//SAFE_DELETE(pInImage);
-	m_pOrignImage = pInImage;
-	//m_pOrignImage=GetFaceRect(m_pOrignImage);
-	//SAFE_DELETE(pInImage);
-	this->Invalidate(FALSE);
+	return pInImage;
+
 }
-
-
 
 
 
@@ -546,8 +566,9 @@ BOOL CExampleDemoDlg::ResizeBitmap(Bitmap **ppImg, int m_NewWidth, int m_NewHeig
 
 
 #include "facepp/PupilGUI.h"
-Bitmap* CExampleDemoDlg::GetFaceRect(Bitmap* pImageSori)
+bool CExampleDemoDlg::GetFaceRect(Bitmap* pImageSori)
 {
+	//_sleep(100);
 	Bitmap* pImageS = pImageSori->Clone(0, 0, pImageSori->GetWidth(), pImageSori->GetHeight(), PixelFormat32bppARGB);
 	// TODO:  在此添加您专用的创建代码
 	float scalew = 1.;
@@ -574,13 +595,22 @@ Bitmap* CExampleDemoDlg::GetFaceRect(Bitmap* pImageSori)
 	{
 		int x0=cpi.m_face_detection.rFace.left;
 		int y0 = cpi.m_face_detection.rFace.top;
-		int width = cpi.m_face_detection.rFace.right;
-		int height = cpi.m_face_detection.rFace.bottom;
-		return GetRect(CRect(x0/scalew, y0/scalew, width/scalew, height/scalew), pImageSori);
+		int width = (cpi.m_face_detection.rFace.right-x0)/scalew;
+		int height = (cpi.m_face_detection.rFace.bottom-y0)/scalew;
+		if (height+width<700)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+		//return GetRect(CRect(x0/scalew, y0/scalew, width/scalew, height/scalew), pImageSori);
+
 	}
 	else
 	{
-		return pImageSori;
+		return false;
 	}
 
 

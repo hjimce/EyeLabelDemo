@@ -3,6 +3,8 @@
 #################
 
 *.pydevproject
+.db
+.VC.db
 .project
 .metadata
 bin/
